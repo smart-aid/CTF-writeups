@@ -1,0 +1,68 @@
+While scanning the whole network with nmap i found  five hosts are up.
+
+The i look around for *.81 because it's my lucky number.(Kidding)
+#172.16.64.81
+"
+22/tcp open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.8 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 09:1e:bf:d0:44:0f:bc:c8:64:bd:ac:16:09:79:ca:a8 (RSA)
+|   256 df:60:fc:fc:db:4b:be:b6:3e:7a:4e:84:4c:a1:57:7d (ECDSA)
+|_  256 ce:8c:fe:bd:76:77:8e:bd:c9:b8:8e:dc:66:b8:80:38 (ED25519)
+80/tcp open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Apache2 Ubuntu Default Page: It works
+MAC Address: 00:50:56:A2:10:00 (VMware)
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+"
+I then look around the webpage running on port 80. It's just the default apache page and obviously it's a dead end.
+
+Then I tried some directory brute forcing using gobuster.
+Then,I found Two interesting directories while brute forcing they are: /webapp and /img
+/webapp is  a simple login page.
+then i thought the login page was dead end if i have no credentials to login.
+
+And then I visited /img which gives me other subdirectories.I looked around all of them but you don’t need to do this.
+In /img/custom….. I found a backup file:users.bak where credentials are stored and obviously it’s not right for the system but for us it’s interesting(maybe).
+
+#Found credentials
+#john1:password123
+#peter:youdonotguessthatone5
+
+
+Then i tried to login with john1 which took me to another dead end(Not really)  ‘500.php’ 
+
+Then I decided to see why it’s giving me Lol(500.php with nothing). So I fired my best Burp to investigate.
+
+
+Then i found a big LOLl response:
+
+#Mysql password in response:
+HTTP/1.1 302 Found
+
+X-DB-Key: x41x41x412019!
+X-DB-User: root
+X-DB-name: mysql
+Location: 500.php
+Content-Length: 0
+Connection: close
+Content-Type: text/html; charset=UTF-8
+
+Obviously like a lame man I tried to login with the default port and it gave me a big Lol. Then I looked back at my network enumeration and I noticed I haven't scanned full ports yet.
+
+The output then made  me remember the line “Think outside the box” ( Haha Trying to motivate nobody).
+
+The mysql was running on port 13306( It's another lucky number.)
+
+And the flag is as:
+
+MySQL [cmsbase]> select * from flag;
++----+------------------------------+
+| id | content                      |
++----+------------------------------+
+|  1 | Congratulations, you got it! |
++----+------------------------------+
+1 row in set (0.459 sec)
+
+
+Conclusion: Enjoy! with my grammar mistcakes.
+
